@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}关于 - 图像伪造检测系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="text-center mb-0">关于系统</h2>
+            </div>
+            <div class="card-body">
+                <h3>项目简介</h3>
+                <p class="lead">本系统是基于深度学习的图像伪造检测技术研究与实现项目，旨在通过人工智能技术鉴别图像是否经过篡改或伪造。</p>
+                
+                <div class="mt-4">
+                    <h4>主要功能</h4>
+                    <ul>
+                        <li>检测图像是否为人工编辑或AI生成的伪造图像</li>
+                        <li>分析图像真实性的概率</li>
+                        <li>可视化展示检测结果</li>
+                    </ul>
+                </div>
+                
+                <div class="mt-4">
+                    <h4>技术实现</h4>
+                    <p>系统采用了以下关键技术：</p>
+                    <ul>
+                        <li>深度学习模型架构: 使用了基于EfficientNet、ResNet或Xception等先进的卷积神经网络</li>
+                        <li>图像处理: 使用OpenCV和PIL等库进行图像预处理和分析</li>
+                        <li>Web应用: 使用Flask框架构建用户友好的网站界面</li>
+                    </ul>
+                </div>
+                
+                <div class="mt-4">
+                    <h4>数据集</h4>
+                    <p>模型训练使用了多个公开的图像伪造检测数据集，包括但不限于：</p>
+                    <ul>
+                        <li>CASIA数据集</li>
+                        <li>Columbia图像拼接检测数据集</li>
+                        <li>Coverage数据集</li>
+                        <li>NIST Nimble 2016数据集</li>
+                        <li>PS-Battles数据集</li>
+                    </ul>
+                </div>
+                
+                <div class="mt-4">
+                    <h4>模型性能</h4>
+                    <p>当前模型在测试数据集上的性能指标：</p>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>指标</th>
+                                    <th>数值</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>准确率</td>
+                                    <td>92.5%</td>
+                                </tr>
+                                <tr>
+                                    <td>精确率</td>
+                                    <td>91.2%</td>
+                                </tr>
+                                <tr>
+                                    <td>召回率</td>
+                                    <td>93.7%</td>
+                                </tr>
+                                <tr>
+                                    <td>F1分数</td>
+                                    <td>92.4%</td>
+                                </tr>
+                                <tr>
+                                    <td>AUC</td>
+                                    <td>0.943</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="alert alert-secondary">
+                        <small>* 以上数据仅为示例，实际性能取决于所使用的模型和数据集</small>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h4>使用限制</h4>
+                    <div class="alert alert-warning">
+                        <ul class="mb-0">
+                            <li>本系统检测结果仅供参考，不应作为唯一判断依据</li>
+                            <li>系统对特定类型的图像伪造手法可能存在识别盲点</li>
+                            <li>随着伪造技术的不断发展，系统需要持续更新以保持有效性</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-5">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">返回检测页面</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,286 @@
+{% extends 'base.html' %}
+
+{% block title %}首页 - 图像伪造检测系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <!-- 欢迎卡片 -->
+        <div class="card welcome-card mb-4">
+            <div class="card-body text-center py-5">
+                <div class="icon-container mb-4">
+                    <i class="bi bi-shield-check display-1 text-primary"></i>
+                </div>
+                <h1 class="display-5 fw-bold mb-3">图像伪造检测系统</h1>
+                <p class="lead mb-4">
+                    使用深度学习技术帮助您检测图像是否经过篡改或人工合成
+                </p>
+                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                    <a href="#detect-section" class="btn btn-primary btn-lg px-4 gap-3">
+                        <i class="bi bi-image me-2"></i>开始检测
+                    </a>
+                    <a href="{{ url_for('about') }}" class="btn btn-outline-secondary btn-lg px-4">
+                        <i class="bi bi-info-circle me-2"></i>了解更多
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 检测卡片 -->
+        <div id="detect-section" class="card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="text-center mb-0">
+                    <i class="bi bi-search me-2"></i>图像检测
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <p class="lead">
+                        上传图片以检测图像是否被伪造或篡改。系统将分析图像并给出真实或伪造的判断结果。
+                    </p>
+                </div>
+                
+                <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" id="uploadForm" class="upload-form">
+                    <div class="upload-container mb-4">
+                        <div class="upload-area" id="uploadArea">
+                            <div class="upload-content text-center">
+                                <i class="bi bi-cloud-arrow-up-fill display-4 mb-3 text-primary"></i>
+                                <h5>点击或拖放图像到此处</h5>
+                                <p class="text-muted">支持JPG、JPEG和PNG格式，最大16MB</p>
+                            </div>
+                            <input type="file" class="form-control visually-hidden" id="file" name="file" accept=".jpg,.jpeg,.png" required>
+                        </div>
+                    </div>
+                    
+                    <div class="image-preview-container text-center mt-4 d-none" id="imagePreviewContainer">
+                        <!-- 由JavaScript填充内容 -->
+                    </div>
+                    
+                    <div class="d-grid gap-2 col-md-6 mx-auto mt-4">
+                        <button class="btn btn-primary btn-lg" type="submit" id="uploadBtn">
+                            <span id="uploadBtnText">上传并检测</span>
+                            <span id="uploadSpinner" class="spinner-border spinner-border-sm d-none ms-2" role="status" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- 功能特点卡片 -->
+        <div class="card mt-4">
+            <div class="card-header bg-info text-white">
+                <h3 class="mb-0">
+                    <i class="bi bi-info-circle me-2"></i>使用说明
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row features-container">
+                    <div class="col-md-6 mb-4">
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="bi bi-upload"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h5>上传图像</h5>
+                                <p>点击上传区域选择要检测的图像文件</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="bi bi-gpu-card"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h5>AI分析</h5>
+                                <p>深度学习模型自动分析图像特征</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="bi bi-check-circle"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h5>检测结果</h5>
+                                <p>获取图像真伪的详细分析结果</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="bi bi-shield-lock"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h5>隐私保护</h5>
+                                <p>上传的图像仅用于检测，不会存储</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning mt-3">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <strong>注意：</strong> 系统基于深度学习模型进行检测，可能存在一定的误判率。检测结果仅供参考，最终判断请结合专业知识和其他证据。
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* 首页特定样式 */
+    .welcome-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9f2ff 100%);
+        border-radius: 20px;
+    }
+    
+    .icon-container {
+        background-color: rgba(63, 106, 216, 0.1);
+        width: 120px;
+        height: 120px;
+        border-radius: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+    }
+    
+    .upload-area {
+        border: 2px dashed #dee2e6;
+        border-radius: 12px;
+        padding: 2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: block;
+    }
+    
+    .upload-area:hover, .upload-area.dragover {
+        border-color: var(--primary-color);
+        background-color: rgba(63, 106, 216, 0.05);
+    }
+    
+    .feature-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        background-color: #f8f9fa;
+        height: 100%;
+    }
+    
+    .feature-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .feature-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 25px;
+        background: var(--primary-gradient);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+    
+    .feature-content {
+        flex-grow: 1;
+    }
+    
+    .feature-content h5 {
+        margin-bottom: 0.5rem;
+        color: var(--dark-color);
+    }
+    
+    .feature-content p {
+        margin-bottom: 0;
+        color: var(--secondary-color);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 拖放功能
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('file');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        
+        if (uploadArea && fileInput) {
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                uploadArea.classList.add('dragover');
+            }
+            
+            function unhighlight() {
+                uploadArea.classList.remove('dragover');
+            }
+            
+            uploadArea.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if(files.length) {
+                    fileInput.files = files;
+                    // 触发change事件，使文件预览功能工作
+                    const event = new Event('change', { bubbles: true });
+                    fileInput.dispatchEvent(event);
+                }
+            }
+            
+            // 点击上传区域时触发文件选择
+            uploadArea.addEventListener('click', function(e) {
+                // 只有当预览区域隐藏或点击的不是预览区域内的元素时才触发
+                const isPreviewShown = !imagePreviewContainer.classList.contains('d-none');
+                
+                if (!isPreviewShown || !imagePreviewContainer.contains(e.target)) {
+                    fileInput.click();
+                }
+            });
+        }
+        
+        // 特性项动画
+        const features = document.querySelectorAll('.feature-item');
+        features.forEach((feature, index) => {
+            feature.style.setProperty('--child-index', index);
+            feature.classList.add('animate-ready');
+            
+            // 设置交错动画时间
+            setTimeout(() => {
+                feature.classList.add('animate-in');
+            }, 100 * index);
+        });
+    });
+    
+    // 图像预览功能已经由main.js中的函数增强处理
+</script>
+{% endblock %} 

@@ -1,0 +1,481 @@
+{% extends 'base.html' %}
+
+{% block title %}检测结果 - 图像伪造检测系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="card result-card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="text-center mb-0">
+                    <i class="bi bi-search-heart me-2"></i>检测结果
+                </h2>
+            </div>
+            <div class="card-body p-0">
+                <!-- 结果状态区 -->
+                <div class="result-status-bar {{ 'success-status' if result.class == '真实' else 'danger-status' }}">
+                    <div class="result-icon">
+                        {% if result.class == '真实' %}
+                            <i class="bi bi-check-circle-fill"></i>
+                        {% else %}
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                        {% endif %}
+                    </div>
+                    <div class="result-text">
+                        <h3>检测结论：此图像{{ "很可能" if (result.class == '真实' and result.real_prob > 85) or (result.class == '伪造' and result.fake_prob > 85) else "可能" }}是<span>{{ result.class }}</span>的</h3>
+                        <p class="mb-0">
+                            可信度：<strong>{{ result.real_prob|round(2) if result.class == '真实' else result.fake_prob|round(2) }}%</strong>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- 主要内容区 -->
+                <div class="p-4">
+                    <div class="row">
+                        <!-- 图像展示区 -->
+                        <div class="col-md-6 mb-4">
+                            <div class="image-display-card">
+                                <div class="image-display-header">
+                                    <i class="bi bi-image me-2"></i>检测的图像
+                                </div>
+                                <div class="image-display-body">
+                                    <div class="image-wrapper">
+                                        <img src="{{ url_for('static', filename=result.image_path) }}" alt="上传的图像" class="img-fluid img-thumbnail">
+                                    </div>
+                                    <div class="image-actions mt-3">
+                                        <button type="button" class="btn btn-sm btn-outline-primary image-zoom-btn">
+                                            <i class="bi bi-zoom-in me-1"></i>查看大图
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 结果详情区 -->
+                        <div class="col-md-6 mb-4">
+                            <div class="result-details-card h-100">
+                                <h4 class="card-title">
+                                    <i class="bi bi-pie-chart-fill me-2"></i>详细分析
+                                </h4>
+                                
+                                <!-- 真实/伪造概率 -->
+                                <div class="probabilities-container mt-4">
+                                    <h5>检测概率</h5>
+                                    <div class="probability-item">
+                                        <div class="probability-label">
+                                            <span class="badge bg-success me-2">真实</span>
+                                            <span class="probability-value">{{ result.real_prob|round(2) }}%</span>
+                                        </div>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-success real-progress-bar" role="progressbar" 
+                                                 data-value="{{ result.real_prob }}"
+                                                 aria-valuenow="{{ result.real_prob }}" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="probability-item mt-3">
+                                        <div class="probability-label">
+                                            <span class="badge bg-danger me-2">伪造</span>
+                                            <span class="probability-value">{{ result.fake_prob|round(2) }}%</span>
+                                        </div>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-danger fake-progress-bar" role="progressbar" 
+                                                 data-value="{{ result.fake_prob }}"
+                                                 aria-valuenow="{{ result.fake_prob }}" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 结果解释 -->
+                                <div class="result-explanation mt-4">
+                                    <h5><i class="bi bi-info-circle me-2"></i>结果解释</h5>
+                                    <div class="explanation-content p-3">
+                                        {% if result.class == '真实' and result.real_prob > 90 %}
+                                            <p>此图像具有很高的真实性，很可能是未经过任何篡改的原始图像。</p>
+                                            <p>系统没有检测到常见的图像编辑痕迹或AI生成特征。</p>
+                                        {% elif result.class == '真实' and result.real_prob > 70 %}
+                                            <p>此图像可能是真实的，但也可能存在一些轻微的处理或编辑。</p>
+                                            <p>建议结合图像的来源和上下文进行综合判断。</p>
+                                        {% elif result.class == '伪造' and result.fake_prob > 90 %}
+                                            <p>此图像很可能经过了明显的篡改或是完全由AI生成的。</p>
+                                            <p>系统检测到图像中存在伪造特征，建议谨慎使用此图像。</p>
+                                        {% elif result.class == '伪造' and result.fake_prob > 70 %}
+                                            <p>此图像可能经过了某种程度的修改或合成。</p>
+                                            <p>系统检测到一些可疑特征，建议进行进一步验证。</p>
+                                        {% else %}
+                                            <p>系统对此图像的判断置信度不高，可能存在以下原因：</p>
+                                            <ul>
+                                                <li>图像质量较低或存在噪点</li>
+                                                <li>图像包含不典型的特征</li>
+                                                <li>使用了系统不熟悉的编辑手法</li>
+                                            </ul>
+                                            <p>建议结合其他方法进行验证。</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 底部操作区 -->
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="result-disclaimer">
+                                    <small class="text-muted">
+                                        <i class="bi bi-exclamation-circle me-1"></i>此检测结果仅供参考，不作为最终判断依据
+                                    </small>
+                                </div>
+                                <div class="action-buttons">
+                                    <a href="{{ url_for('index') }}" class="btn btn-primary">
+                                        <i class="bi bi-arrow-repeat me-2"></i>重新检测
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 图像查看模态框 -->
+<div class="modal" id="imageModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">图像查看</h5>
+                <button type="button" class="btn-close close-modal" aria-label="关闭"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="{{ url_for('static', filename=result.image_path) }}" alt="上传的图像" class="img-fluid">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary close-modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+<style>
+    /* 结果页面特定样式 */
+    .result-card {
+        overflow: visible;
+    }
+    
+    .result-status-bar {
+        display: flex;
+        align-items: center;
+        padding: 1.5rem;
+        color: white;
+        position: relative;
+    }
+    
+    .success-status {
+        background: var(--success-gradient);
+    }
+    
+    .danger-status {
+        background: var(--danger-gradient);
+    }
+    
+    .result-icon {
+        font-size: 2.5rem;
+        margin-right: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 70px;
+        height: 70px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        backdrop-filter: blur(4px);
+    }
+    
+    .result-text h3 {
+        margin-bottom: 0.5rem;
+        color: white;
+        font-weight: 700;
+    }
+    
+    .result-text h3 span {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.2rem 0.8rem;
+        border-radius: 30px;
+        font-weight: 700;
+    }
+    
+    .image-display-card, .result-details-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+        height: 100%;
+    }
+    
+    .image-display-header {
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+        color: var(--dark-color);
+    }
+    
+    .image-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        min-height: 250px;
+    }
+    
+    .image-wrapper img {
+        max-height: 300px;
+        border-radius: 6px;
+        transition: transform 0.3s ease;
+    }
+    
+    .image-wrapper img:hover {
+        transform: scale(1.02);
+    }
+    
+    .result-details-card h4 {
+        font-weight: 600;
+        color: var(--dark-color);
+    }
+    
+    .probability-item {
+        margin-bottom: 0.8rem;
+    }
+    
+    .probability-label {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+    }
+    
+    .probability-value {
+        font-weight: 600;
+    }
+    
+    .explanation-content {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        font-size: 0.95rem;
+    }
+    
+    .explanation-content p {
+        margin-bottom: 0.5rem;
+    }
+    
+    .explanation-content ul {
+        padding-left: 1.2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* 动画效果 */
+    .progress-bar {
+        position: relative;
+        overflow: hidden;
+        width: 0%; /* 初始宽度为0，由JS控制 */
+    }
+    
+    .progress-bar::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0),
+            rgba(255, 255, 255, 0.3),
+            rgba(255, 255, 255, 0)
+        );
+        width: 30%;
+        animation: progress-shine 2s infinite;
+    }
+    
+    @keyframes progress-shine {
+        0% {
+            left: -100%;
+        }
+        100% {
+            left: 100%;
+        }
+    }
+    
+    /* 模态框样式 */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1050;
+        overflow: auto;
+    }
+    
+    .modal-dialog {
+        position: relative;
+        margin: 1.75rem auto;
+        pointer-events: none;
+        max-width: 800px;
+    }
+    
+    .modal-dialog-centered {
+        display: flex;
+        align-items: center;
+        min-height: calc(100% - 3.5rem);
+    }
+    
+    .modal-content {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        pointer-events: auto;
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+    }
+    
+    .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.5rem;
+        background: var(--primary-gradient);
+        color: white;
+    }
+    
+    .modal-title {
+        margin-bottom: 0;
+        line-height: 1.5;
+        font-weight: 600;
+    }
+    
+    .btn-close {
+        background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3E%3Cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3E%3C/svg%3E") center/1em auto no-repeat;
+        padding: 0.5rem;
+        margin: -0.5rem -0.5rem -0.5rem auto;
+        width: 1.5em;
+        height: 1.5em;
+        cursor: pointer;
+        border: 0;
+        opacity: 0.8;
+        transition: opacity 0.2s;
+    }
+    
+    .btn-close:hover {
+        opacity: 1;
+    }
+    
+    .modal-body {
+        position: relative;
+        flex: 1 1 auto;
+        padding: 1.5rem;
+    }
+    
+    .modal-footer {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 1rem 1.5rem;
+        border-top: none;
+    }
+    
+    .img-zoomed {
+        max-width: 100%;
+        transition: all 0.3s ease;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 设置进度条宽度
+        initializeProgressBars();
+        
+        // 初始化模态框
+        initializeImageModal();
+    });
+    
+    // 初始化进度条
+    function initializeProgressBars() {
+        // 真实概率进度条
+        const realProgressBar = document.querySelector('.real-progress-bar');
+        if (realProgressBar) {
+            const realValue = realProgressBar.getAttribute('data-value');
+            setTimeout(() => {
+                realProgressBar.style.width = realValue + '%';
+            }, 200);
+        }
+        
+        // 伪造概率进度条
+        const fakeProgressBar = document.querySelector('.fake-progress-bar');
+        if (fakeProgressBar) {
+            const fakeValue = fakeProgressBar.getAttribute('data-value');
+            setTimeout(() => {
+                fakeProgressBar.style.width = fakeValue + '%';
+            }, 300);
+        }
+    }
+    
+    // 初始化图像查看模态框
+    function initializeImageModal() {
+        const modal = document.getElementById('imageModal');
+        const openBtn = document.querySelector('.image-zoom-btn');
+        const closeButtons = document.querySelectorAll('.close-modal');
+        
+        if (!modal || !openBtn) return;
+        
+        // 打开模态框
+        openBtn.addEventListener('click', function() {
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden'; // 防止背景滚动
+        });
+        
+        // 关闭模态框的所有方式
+        // 1. 关闭按钮
+        closeButtons.forEach(button => {
+            button.addEventListener('click', closeModal);
+        });
+        
+        // 2. 点击背景
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+        
+        // 3. ESC键
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.style.display === 'block') {
+                closeModal();
+            }
+        });
+        
+        // 关闭模态框函数
+        function closeModal() {
+            modal.style.display = 'none';
+            document.body.style.overflow = ''; // 恢复背景滚动
+        }
+    }
+</script>
+{% endblock %} 
