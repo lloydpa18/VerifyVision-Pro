@@ -25,6 +25,9 @@ venv/
 imgvenv/
 ENV/
 
+# 模型文件
+models/
+
 # 日志和上传的文件
 *.log
 static/uploads/*
