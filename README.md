@@ -827,6 +827,35 @@ This section addresses frequently encountered problems:
    pip install -r requirements.txt
    ```
 
+#### Python Version Compatibility Issues
+
+**Symptoms**: Errors occur when installing dependencies with newer Python versions (e.g., Python 3.13), especially with numpy and pkgutil packages.
+
+**Solution**:
+1. Create a virtual environment with Python 3.9-3.10:
+   ```bash
+   # First check available Python versions
+   which -a python3
+   python3 -V
+   /usr/bin/python3 -V  # This might show the system Python version
+   
+   # Create a virtual environment with compatible versions
+   /usr/bin/python3 -m venv imgvenv
+   source imgvenv/bin/activate
+   ```
+
+2. Verify Python version:
+   ```bash
+   python -V  # This should show a compatible version, e.g., Python 3.9.x
+   ```
+
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+> **Note**: The project dependencies are most compatible with Python 3.8-3.10. Newer versions might require adjustments to dependency versions or waiting for package updates to support new Python versions.
+
 ### 🖥️ Runtime Issues
 
 #### Port Occupation on macOS
@@ -834,16 +863,23 @@ This section addresses frequently encountered problems:
 **Symptoms**: Web application fails to start with "Address already in use" error.
 
 **Solution**:
-1. Use a different port:
+1. On macOS, port 5000 is typically used by the AirPlay service, use a different port (like 8080):
    ```bash
    python main.py web --model-path models/saved/best_model.pth --model-name cnn --port 8080
    ```
 
-2. Or find and kill the process using port 5000:
+2. Or find and kill the process using port 5000 (not recommended, may affect system services):
    ```bash
    sudo lsof -i :5000
    kill -9 <PID>
    ```
+
+3. You can also specify a local-only interface when starting the web application:
+   ```bash
+   python main.py web --model-path models/saved/best_model.pth --model-name cnn --port 5000 --host 127.0.0.1
+   ```
+
+> **Note**: In macOS Monterey and newer versions, port 5000 is reserved for the AirPlay Receiver service. To use the default port, disable the AirPlay Receiver in system settings or choose an alternative port.
 
 #### Out of Memory (OOM) Errors
 
@@ -1050,7 +1086,7 @@ VerifyVision-Pro is released under the MIT License.
 ### MIT License
 
 ```
-Copyright (c) 2023 VerifyVision-Pro Contributors
+Copyright (c) 2025 VerifyVision-Pro Contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -1895,6 +1931,35 @@ python main.py prune \
    pip install -r requirements.txt
    ```
 
+##### Python版本兼容性问题
+
+**症状**：使用较新版本的Python（如Python 3.13）安装依赖时出现错误，特别是与numpy、pkgutil等包相关的错误。
+
+**解决方案**：
+1. 使用Python 3.9-3.10版本创建虚拟环境：
+   ```bash
+   # 首先检查可用的Python版本
+   which -a python3
+   python3 -V
+   /usr/bin/python3 -V  # 可能会显示系统Python版本
+   
+   # 使用兼容版本创建虚拟环境
+   /usr/bin/python3 -m venv imgvenv
+   source imgvenv/bin/activate
+   ```
+
+2. 验证Python版本：
+   ```bash
+   python -V  # 应显示兼容版本，如Python 3.9.x
+   ```
+
+3. 安装依赖：
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+> **注意**：该项目的依赖与Python 3.8-3.10版本最为兼容。较新版本可能需要调整依赖版本或等待包更新以支持新的Python版本。
+
 #### 🖥️ 运行时问题
 
 ##### macOS上的端口占用
@@ -1902,16 +1967,23 @@ python main.py prune \
 **症状**：Web应用启动失败，提示"地址已被使用"错误。
 
 **解决方案**：
-1. 使用不同端口：
+1. 在macOS上，端口5000通常被AirPlay服务占用，建议使用其他端口（如8080）：
    ```bash
    python main.py web --model-path models/saved/best_model.pth --model-name cnn --port 8080
    ```
 
-2. 或找到并终止使用端口5000的进程：
+2. 或找到并终止使用端口5000的进程（不推荐，可能会影响系统服务）：
    ```bash
    sudo lsof -i :5000
    kill -9 <PID>
    ```
+
+3. 也可以在启动Web应用时使用`--host`参数指定只在本地接口上监听：
+   ```bash
+   python main.py web --model-path models/saved/best_model.pth --model-name cnn --port 5000 --host 127.0.0.1
+   ```
+
+> **注意**：macOS Monterey及更新版本中，端口5000被AirPlay接收器服务预留。如需在默认端口运行，请在系统设置中禁用AirPlay接收器或选择其他端口。
 
 ##### 内存溢出(OOM)错误
 
@@ -2118,7 +2190,7 @@ VerifyVision-Pro在MIT许可证下发布。
 ### MIT许可证
 
 ```
-版权所有 (c) 2023 VerifyVision-Pro贡献者
+版权所有 (c) 2025 VerifyVision-Pro贡献者
 
 特此授予免费许可，任何获得本软件和相关文档文件（"软件"）副本的人，
 不受限制地处理本软件，包括但不限于使用、复制、修改、合并、发布、
